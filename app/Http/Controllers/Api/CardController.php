@@ -85,17 +85,31 @@ class CardController extends Controller
         }
     }
     public function update(Request $request, $id){
+  $card = Card::find($id);
+  $card = Card::find($id);
+  if (!$card) { 
+      return response()->json([
+          'status' => 404,
+          'message' => 'Error, Not Found!'
+      ], 404);
+  }
+  if (auth()->user()->id !== $card->user_id) {
+      return response()->json([
+          'status' => 403,
+          'message' => 'Unauthorized, You are not allowed to update this card!'
+      ], 403);
+  }
         $validator =  $request->validate([
-            'logo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'title' => 'required|string|max:255',
-            'slogan' => 'nullable|string|max:255',
-            'phonenumber' => 'required|digits:10',
-            'email' => 'required|email|max:255',
-            'address' => 'nullable|string|max:255',
-            'website' => 'nullable|url|max:255',
+            'logo' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'title' => 'string|max:255',
+            'slogan' => 'string|max:255',
+            'phonenumber' => 'digits:10',
+            'email' => 'email|max:255',
+            'address' => 'string|max:255',
+            'website' => 'url|max:255',
         ]);
-        $validator['user_id'] = auth()->user()->id;
-        $card = Card::find($id);
+ 
+      
        
         if ($card) { 
             $card->update($validator);
@@ -113,8 +127,18 @@ class CardController extends Controller
     
     public function destroy($id){
         $card = Card::find($id);
-        if($card){
+        if (auth()->user()->id !== $card->user_id) {
+            return response()->json([
+                'status' => 403,
+                'message' => 'Unauthorized, You are not allowed to update this card!'
+            ], 403);
+        }
+        elseif($card){
             $card->delete();
+            return response()->json([
+                'status' => 200,
+                'message' => 'Deleted Successfully'
+            ], 200);
         }else{
             return response()->json([
                 'status' => 404,

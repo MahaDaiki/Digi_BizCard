@@ -38,7 +38,8 @@
   
           <div class="card bg-glass">
             <div class="card-body px-4 py-5 px-md-5 ">
-              <form method="POST">
+              <form method="POST" action="{{ '/register' }}">
+                @csrf
                   <div class=" mb-4">
                     <div class="form-outline d-flex row"> 
                         <i class="bi bi-person-fill"></i>
