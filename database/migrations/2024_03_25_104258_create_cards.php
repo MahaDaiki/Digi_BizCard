@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('Logo')->nullable();
-            $table->string('title');
-            $table->string('slogan');
-            $table->integer('phonenumber');
-            $table->string('email');
+            $table->string('title')->nullable();
+            $table->string('slogan')->nullable();
+            $table->integer('phonenumber')->nullable();
+            $table->string('email')->nullable();
             $table->string('Address')->nullable();
             $table->string('website')->nullable();
             $table->timestamps();

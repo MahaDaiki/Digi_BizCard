@@ -18,10 +18,10 @@ Route::post('logout',[UserController::class,'logout'])
 Route::get('cards',[CardController::class,'index']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::post('cards', [CardController::class, 'store']);
+    Route::post('cards/add', [CardController::class, 'store']);
     Route::get('cards/{id}', [CardController::class, 'show']);
     Route::get('cards/{id}/edit',[CardController::class,'edit']);
-    Route::put('cards/{id}/edit', [CardController::class, 'update']);
-    Route::delete('cards/{id}', [CardController::class, 'destroy']);
+    Route::put('cards/{id}/update', [CardController::class, 'update']);
+    Route::delete('cards/{id}/destroy', [CardController::class, 'destroy']);
 });
 
