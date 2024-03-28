@@ -9,9 +9,52 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * @OA\Tag(
+ *     name="Authentication",
+ *     description="Endpoints for user authentication"
+ * )
+ * @OA\Tag(
+ *     name="Users",
+ *     description="Endpoints for user management"
+ * )
+ */
 
 class UserController extends Controller
 {
+    /**
+     * @OA\Post(
+     *     path="/api/register",
+     *     summary="Register a new user",
+     *     tags={"Users"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name", "email", "password"},
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="email", type="string"),
+     *             @OA\Property(property="password", type="string", format="password"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User registration successful",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="message", type="string", example="User Created Successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request: One or more required fields are empty",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="integer", example=400),
+     *             @OA\Property(property="message", type="string", example="One or more required fields are empty")
+     *         )
+     *     )
+     * )
+     */
+   
     public function register(Request $request){
 
         if (empty($request->name) || empty($request->email) || empty($request->password)) {
@@ -43,7 +86,38 @@ class UserController extends Controller
             ], 500);
         }
     }
-    
+        /**
+     * @OA\Post(
+     *     path="/api/login",
+     *     summary="User login",
+     *     tags={"Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email", "password"},
+     *             @OA\Property(property="email", type="string"),
+     *             @OA\Property(property="password", type="string", format="password"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User login successful",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="access_token", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized: Invalid credentials",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="integer", example=401),
+     *             @OA\Property(property="message", type="string", example="Invalid Credentials")
+     *         )
+     *     )
+     * )
+     */
+
     public function login(Request $request){
         $loginUserData = $request->validate([
             'email'=>'required|string|email',
@@ -63,6 +137,23 @@ class UserController extends Controller
         ],200);
     }
     }
+    
+    /**
+     * @OA\Post(
+     *     path="/api/logout",
+     *     summary="User logout",
+     *     tags={"Authentication"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="User logout successful",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="message", type="string", example="Logged out")
+     *         )
+     *     )
+     * )
+     */
 
     public function logout(Request $request)
     {
