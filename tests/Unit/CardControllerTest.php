@@ -115,4 +115,24 @@ class CardControllerTest extends TestCase
                 'message' => 'Deleted Successfully'
             ]);
     }
+    public function test_get_user_cards()
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        Card::factory()->create(['user_id' => $user->id]);
+        Card::factory()->create(['user_id' => $user->id]);
+
+        $response = $this->get('/api/cards/user');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'status',
+            'cards',
+        ]);
+
+        $cardsCount = Card::where('user_id', $user->id)->count();
+        $response->assertJsonCount($cardsCount, 'cards');
+    }
+
 }

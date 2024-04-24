@@ -19,3 +19,16 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+<IfModule mod_headers.c>
+    # Allow cross-origin requests from specific origins
+    Header set Access-Control-Allow-Origin "http://localhost:5173"
+    
+    # Allow credentials (cookies) to be included in cross-origin requests
+    Header set Access-Control-Allow-Credentials "true"
+    
+    # Allow specific headers to be sent with the cross-origin request
+    Header set Access-Control-Allow-Headers "Authorization, Content-Type"
+    
+    # Allow specific HTTP methods in cross-origin requests
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+</IfModule>

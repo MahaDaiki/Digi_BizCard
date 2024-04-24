@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CardRequest;
 use App\Models\Card;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Validator;
 
 /**
@@ -96,13 +99,13 @@ class CardController extends Controller
     public function store(Request $request)
     {
         $validator =  $request->validate([
-            'logo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'logo' => 'nullable',
             'title' => 'required|string|max:255',
             'slogan' => 'nullable|string|max:255',
             'phonenumber' => 'required|digits:10',
             'email' => 'required|email|max:255',
             'address' => 'nullable|string|max:255',
-            'website' => 'nullable|url|max:255',
+            'website' => 'nullable|max:255',
         ]);
         $validator['user_id'] = auth()->user()->id;
         $card = Card::create($validator);
@@ -241,10 +244,10 @@ class CardController extends Controller
             'logo' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'title' => 'string|max:255',
             'slogan' => 'string|max:255',
-            'phonenumber' => 'digits:10',
+            'phonenumber' => 'numeric',
             'email' => 'email|max:255',
             'address' => 'string|max:255',
-            'website' => 'url|max:255',
+            'website' => 'max:255',
         ]);
  
       
@@ -314,4 +317,54 @@ class CardController extends Controller
             ], 404);
         }
     }
+    /**
+ * @OA\Get(
+ *     path="/api/cards/user",
+ *     summary="Get cards by authenticated user ID",
+ *     tags={"Cards"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Response(
+ *         response=200,
+ *         description="Returns the user's cards",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="status", type="integer", example=200),
+ *             @OA\Property(property="cards", type="array", @OA\Items(type="object"))
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="No cards found for the user",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="status", type="integer", example=404),
+ *             @OA\Property(property="message", type="string", example="No cards found for the user")
+ *         )
+ *     )
+ * )
+ */
+public function showAuthenticatedUserCard()
+{
+    $userId = Auth::id();
+    if (!$userId) {
+        return response()->json(['error' => 'Unauthenticated.'], 401);
+    }
+
+    $businessCard = Card::where('user_id', $userId)->get();
+    
+    if (!$businessCard) {
+        return response()->json(['error' => ' No cards found for authenticated user.'], 404);
+    }
+    
+    return response()->json($businessCard, 200);
+}
+
+public function countcards(){
+    // $users = User::count();
+$cards = Card::count();
+// $users = User::get();
+// $user= $users->id;
+// $cards = Card::where('user_id', $user)->count();
+$card = Card::join('users','users.id','=','cards.user_id')->selectRaw('user_id ,count(user_id)')
+              ->groupBy('user_id')->get();
+ return response()->json($card, 200);
+}
 }
